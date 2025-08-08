@@ -11,11 +11,11 @@ header {
     color: white;
     padding: 2em;
     text-align: center;
-    border-bottom: 3px solid #009688; /* Teal accent border */
+    border-bottom: 3px solid #8B0000; /* Dark red accent border */
 }
 
 nav {
-    background-color: #004d40; /* Dark Teal for the navbar */
+    background-color: #4B0082; /* Indigo for the navbar */
     padding: 1em;
     text-align: center;
 }
@@ -29,7 +29,7 @@ nav a {
 }
 
 nav a:hover {
-    color: #b2dfdb; /* Lighter teal for hover effect */
+    color: #9370DB; /* Lighter purple for hover effect */
     text-decoration: none;
 }
 
@@ -48,17 +48,17 @@ section {
 }
 
 section h2 {
-    color: #009688; /* Teal accent for section headers */
+    color: #8B0000; /* Dark red accent for section headers */
 }
 
 a {
-    color: #009688; /* Teal for all links */
+    color: #9370DB; /* Lighter purple for all links */
     text-decoration: none;
 }
 
 a:hover {
     text-decoration: underline;
-    color: #00796b; /* A darker teal for link hover */
+    color: #4B0082; /* A darker purple for link hover */
 }
 
 pre {
