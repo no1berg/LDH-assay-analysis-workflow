@@ -11,11 +11,11 @@ header {
     color: white;
     padding: 2em;
     text-align: center;
-    border-bottom: 3px solid #ED266F; /* Dark red accent border */
+    border-bottom: 2px solid #ca2949; /* Dark red accent border */
 }
 
 nav {
-    background-color: #4B0082; /* Indigo for the navbar */
+    background-color: #303030; /* Dark gray for the navbar */
     padding: 1em;
     text-align: center;
 }
@@ -40,7 +40,7 @@ main {
 }
 
 section {
-    background-color: #010B36; /* A slightly darker blue for content sections */
+    background-color: #1d1d1d; /* A slightly darker gray for content sections */
     padding: 1.5em;
     margin-bottom: 2em;
     border-radius: 8px;
@@ -48,7 +48,7 @@ section {
 }
 
 section h2 {
-    color: #8B0000; /* Dark red accent for section headers */
+    color: #da2a47; /* Dark red accent for section headers */
 }
 
 a {
