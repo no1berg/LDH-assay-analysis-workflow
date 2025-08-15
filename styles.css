@@ -2,7 +2,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #011936; /* A Oxford blue background */
+    background-color: #3b3b3b; /* A Oxford blue background */
     color: #FFFFFB; /* Baby powder text for readability */
 }
 
@@ -40,7 +40,7 @@ main {
 }
 
 section {
-    background-color: #1d1d1d; /* A slightly darker gray for content sections */
+    background-color: #302f2f; /* A slightly darker gray for content sections */
     padding: 1.5em;
     margin-bottom: 2em;
     border-radius: 8px;
