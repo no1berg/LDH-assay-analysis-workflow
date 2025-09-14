@@ -1,0 +1,112 @@
+---
+title: "LDH Cytotoxicity Assay Report"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: yeti
+params:
+  results: NULL
+---
+
+```{r setup, include=FALSE}
+# This chunk sets up the report environment
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(ggplot2)
+library(knitr)
+library(DT)
+library(dplyr)
+library(stringr)
+```
+
+# Summary of Findings
+
+```{r summary_chunk}
+# This chunk calculates the key findings to display them upfront.
+df <- params$results$pairwise_df
+control <- params$results$control_group_name
+
+# Add a significance column if it doesn't exist (e.g., from Kruskal-Wallis)
+if (!"significance" %in% names(df)) {
+  df <- df %>% mutate(significance = ifelse(p.adjusted <= 0.05, "Yes", "No"))
+}
+
+significant_comparisons <- df %>%
+  filter(str_detect(comparison, fixed(control)) & significance == "Yes")
+
+num_significant <- nrow(significant_comparisons)
+total_comparisons <- sum(str_detect(df$comparison, fixed(control)))
+
+# Generate the summary sentence
+summary_sentence <- sprintf(
+  "The analysis was performed using a **%s**. Out of **%d** treatments compared against the control group ('%s'), **%d** showed a statistically significant difference in cytotoxicity.",
+  params$results$test_name,
+  total_comparisons,
+  control,
+  num_significant
+)
+```
+
+`r summary_sentence`
+
+-----
+
+# Cytotoxicity Plot
+
+The plot below visualizes the cytotoxicity levels for each treatment group. Significance brackets indicate comparisons against the selected control group, **`r params$results$control_group_name`**.
+
+```{r plot, fig.width=10, fig.height=6}
+print(params$results$final_plot)
+```
+
+-----
+
+# Detailed Analysis {.tabset}
+
+This section provides the detailed statistical outputs, including the overall test results, pairwise comparisons, and assumption checks.
+
+### Statistical Summary
+
+The choice of statistical test was determined by the user's selection and the results of diagnostic assumption checks.
+
+**Test Performed:** `r params$results$test_name`
+
+**Overall (Omnibus) Test Result:** `r params$results$omnibus_text`
+
+This initial test determines if there is any significant difference *somewhere* among all the groups analyzed.
+
+### Pairwise Comparisons
+
+If the omnibus test was significant, a post-hoc test was run to compare every pair of groups. The table below shows the adjusted p-values for these comparisons. A p-value ≤ 0.05 is typically considered statistically significant.
+
+```{r table}
+datatable(
+  params$results$pairwise_df,
+  caption = "Pairwise comparison results.",
+  options = list(pageLength = 10, searching = TRUE),
+  rownames = FALSE
+)
+```
+
+### Assumption Checks
+
+Parametric tests like ANOVA are most reliable when certain assumptions about the data's distribution are met.
+
+**1. Normality of Residuals (Shapiro-Wilk Test)**
+
+  * This test checks if the model's errors are normally distributed.
+  * The p-value was **`r round(params$results$shapiro_p, 4)`**. The assumption is met if the p-value is \> 0.05.
+
+**2. Homogeneity of Variances (Levene's Test)**
+
+  * This test checks if the variance (or spread) of the data is equal across all groups.
+  * The p-value was **`r round(params$results$levene_p, 4)`**. The assumption is met if the p-value is \> 0.05.
+
+<!-- end list -->
+
+```{r qqplot, fig.width=6, fig.height=5}
+print(params$results$qq_plot)
+```
+
+The Q-Q plot above provides a visual check for the normality assumption.

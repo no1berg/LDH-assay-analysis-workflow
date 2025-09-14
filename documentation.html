@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LDH Cytotoxicity Assay Analysis App Documentation</title>
+    <style>
+        /* Dark Theme CSS */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #c9d1d9;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: #0d1117;
+        }
+        h1, h2, h3, h4 {
+            color: #58a6ff;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 8px;
+        }
+        h1 { font-size: 2.5em; text-align: center; border-bottom: 2px solid #30363d;}
+        h2 { font-size: 2em; margin-top: 40px; }
+        h3 { font-size: 1.5em; margin-top: 30px; border-bottom-style: dashed; }
+        h4 { font-size: 1.2em; margin-top: 25px; border-bottom-style: none; color: #8b949e; }
+        a { color: #58a6ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: #2c313a;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #ff7b72;
+        }
+        pre {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+        pre code { background-color: transparent; padding: 0; border-radius: 0; color: #c9d1d9;}
+        ul, ol { padding-left: 30px; }
+        li { margin-bottom: 10px; }
+        strong, b { color: #f0f6fc; }
+        .note {
+            background-color: rgba(56, 139, 253, 0.1);
+            border-left: 5px solid #58a6ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        hr { border: 0; height: 1px; background: #30363d; margin: 40px 0; }
+        .container {
+            background-color: #161b22;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>LDH Cytotoxicity Assay Analysis App</h1>
+
+        <hr>
+
+        <h2>User Guide</h2>
+        
+        <h3>1. Overview</h3>
+        <p>This Shiny application automates the analysis of Lactate Dehydrogenase (LDH) cytotoxicity assay data. It processes raw 96-well plate reader data to calculate, analyze, and visualize percent cytotoxicity, culminating in a publication-ready interactive plot and a downloadable report.</p>
+        <p>This version includes several powerful features for flexibility and reproducibility:</p>
+        <ul>
+            <li><strong>Dynamic Control Assignment</strong>: Assign your custom group names to control functions directly in the app.</li>
+            <li><strong>Group-Specific Normalization</strong>: Supports experiments where treatment groups have their own dedicated maximum lysis controls.</li>
+            <li><strong>Interactive Plots</strong>: Hover over data points to see their exact values.</li>
+            <li><strong>Dynamic Interpretation</strong>: The "Assumption Checks" and "Interpretation Guide" tabs provide feedback tailored to your specific results.</li>
+            <li><strong>Full Reproducibility</strong>: Download the processed data or a complete HTML report of the entire analysis.</li>
+        </ul>
+
+        <h3>2. How to Use the Application</h3>
+        
+        <h4>Step 1: Prepare Your Input Files</h4>
+        <p>You need two <code>.csv</code> files: a <strong>plate layout</strong> file and a <strong>raw absorbance</strong> file.</p>
+        
+        <h5>A. Plate Layout File (e.g., <code>layout.csv</code>)</h5>
+        <p>This file maps the contents of each well.</p>
+        <ul>
+            <li>The file <strong>must not</strong> have row names (e.g., A, B, C...). The app adds these automatically.</li>
+            <li>The first row is treated as the column header (e.g., 1, 2, 3...).</li>
+            <li>The cells should contain your custom group names.</li>
+        </ul>
+
+        <div class="note">
+            <p><strong>Important: Naming Convention for Per-Treatment Controls</strong></p>
+            <p>To link an experimental group to its specific maximum lysis control, you must name the control using a consistent prefix. The default is <code>Tritonx100-</code>.</p>
+            <p>For a treatment group named <code>DrugA</code>, its corresponding max lysis control must be named <code>Tritonx100-DrugA</code>. The text that comes after the prefix must match exactly.</p>
+        </div>
+
+        <strong>Example <code>layout.csv</code>:</strong>
+<pre><code>1,2,3,4,5,6
+empty,empty,empty,Vehicle,Vehicle,Vehicle
+empty,empty,empty,DrugA,DrugA,DrugA
+untreated,untreated,untreated,Tritonx100-Vehicle,Tritonx100-Vehicle,Tritonx100-Vehicle
+untreated,untreated,untreated,Tritonx100-DrugA,Tritonx100-DrugA,Tritonx100-DrugA
+...</code></pre>
+
+        <h5>B. Raw Absorbance File (e.g., <code>absorbance.csv</code>)</h5>
+        <p>This file contains the raw optical density (OD) readings from the plate reader.</p>
+        <ul>
+            <li>The file <strong>must not</strong> have any headers or row names.</li>
+            <li>Data must be in an <strong>alternating row format</strong>: the first row for 490 nm, the second for 680 nm (background), the third for 490 nm, and so on.</li>
+        </ul>
+
+        <h4>Step 2: Upload Files & Define Controls</h4>
+        <p>In the sidebar, upload your two files. After uploading the layout, dynamic dropdowns will appear. Use these to configure your analysis:</p>
+        <ol>
+            <li><strong>Define Calculation Controls</strong>:
+                <ul>
+                    <li><strong>Spontaneous Lysis</strong>: Select the group name for your untreated cells.</li>
+                    <li><strong>Max Lysis Prefix</strong>: Confirm or change the prefix used to identify max lysis groups.</li>
+                    <li><strong>Blank</strong>: Select the group name for your media-only wells.</li>
+                </ul>
+            </li>
+            <li><strong>Define Analysis Settings</strong>:
+                <ul>
+                    <li><strong>Comparison Control</strong>: Select the group that will serve as the baseline for statistical comparisons (e.g., a "Vehicle" or "DMSO" control).</li>
+                    <li><strong>Statistical Test Method</strong>: Choose "Automatic Selection" to let the app decide between ANOVA and Kruskal-Wallis based on assumption checks, or manually override the choice.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h4>Step 3: Execute and Export</h4>
+        <p>Click the <strong>"Run Analysis"</strong> button to process the data. Once complete, you can download the final processed data from the "Processed Data Preview" tab or download a complete HTML report using the <strong>"Download Report"</strong> button.</p>
+
+        <h3>3. Interpreting the Output Tabs</h3>
+        <ul>
+            <li><strong>Summary & Plot</strong>: Displays the main interactive boxplot. Hover over points to see values. The plot includes significance brackets comparing treatments to your selected control.</li>
+            <li><strong>Detailed Statistics</strong>: Provides tables for the overall (omnibus) test and the detailed pairwise (post-hoc) comparisons.</li>
+            <li><strong>Processed Data Preview</strong>: Shows an interactive table of the final calculated data. Verify your results here and download the data as a CSV.</li>
+            <li><strong>Assumption Checks</strong>: A dynamic guide that explains the tests for normality and equal variances, interprets your data's results, and shows why a particular statistical test was chosen.</li>
+            <li><strong>Interpretation Guide</strong>: A dynamic guide that explains your specific omnibus and post-hoc test results, using an example from your data to make it clear.</li>
+        </ul>
+        
+        <h3>4. Methodology</h3>
+        <p>The app calculates percent cytotoxicity using the formula:</p>
+        <p>$$ \text{Cytotoxicity (\%)} = \frac{(\text{Corrected OD}_{\text{Experimental}} - \text{Mean OD}_{\text{Spontaneous}})}{(\text{Mean OD}_{\text{Maximum}} - \text{Mean OD}_{\text{Spontaneous}})} \times 100 $$</p>
+        <p>Where Corrected OD = OD<sub>490nm</sub> - OD<sub>680nm</sub>. The <strong>Mean OD<sub>Maximum</sub></strong> is calculated specifically for each treatment "family", ensuring accurate normalization.</p>
+
+        <hr>
+
+        <h2>Code Logic Documentation</h2>
+        <p>This section outlines the internal workings of the <code>server</code> function.</p>
+
+        <h3>1. Dynamic UI Rendering</h3>
+        <p>Reactive expressions read the unique group names from the uploaded layout file. A series of <code>renderUI</code> functions then use this list to populate the choices in the sidebar dropdowns, making the entire interface adapt to the user's data.</p>
+        
+        <h3>2. The Main Analysis Pipeline (<code>eventReactive</code>)</h3>
+        <p>The core logic is wrapped in an <code>eventReactive()</code>, which executes only when the "Run Analysis" button is clicked.</p>
+        <ol>
+            <li><strong>Input Validation</strong>: The app first checks if all required files and inputs are present. It then uses <code>validate()</code> and <code>need()</code> to perform a series of checks (e.g., is the file a valid CSV? Do the selected controls exist in the data?) and provides user-friendly error messages if a check fails.</li>
+            <li><strong>Data Processing</strong>: Raw absorbance data is background-corrected (490nm - 680nm). The layout and absorbance data are tidied and merged into a single data frame.</li>
+            <li><strong>Group-Specific Normalization</strong>: This is a key feature. A "treatment family" ID is created for each well by removing the user-defined max lysis prefix. The app then calculates a unique mean maximum lysis absorbance for each family and joins this value back to the main dataset. This ensures every well is normalized against its specific maximum lysis control.</li>
+            <li><strong>Final Calculation & Filtering</strong>: The cytotoxicity formula is applied. All control groups (blank, spontaneous, and max lysis) are then filtered out, leaving a clean dataset for analysis. The <code>group</code> column is re-factored to ensure filtered-out groups do not appear on the plot axis.</li>
+            <li><strong>Statistical Analysis</strong>: Assumption checks (Shapiro-Wilk, Levene's) are performed. Based on these results or the user's choice, the appropriate path (ANOVA or Kruskal-Wallis) is taken.</li>
+            <li><strong>Plot Generation</strong>: An interactive plot is built using <code>ggplot2</code> and <code>ggiraph</code>. Tooltips are added to the data points, and significance bars are generated using <code>ggpubr</code>.</li>
+            <li><strong>Return Results</strong>: All generated objects (the plot, tables, p-values, processed data, etc.) are collected into a single list and returned by the reactive expression.</li>
+        </ol>
+
+        <h3>3. Output Rendering and Downloads</h3>
+        <p>The final part of the server consists of render functions (<code>renderGirafe</code>, <code>renderDataTable</code>, <code>renderUI</code>) and download handlers (<code>downloadHandler</code>). Each of these functions accesses the required item from the <code>analysis_results()</code> list and displays it in the UI or prepares it for download.</p>
+    </div>
+</body>
+</html>
