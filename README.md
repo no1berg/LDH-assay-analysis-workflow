@@ -31,8 +31,8 @@ To run this application on your own machine, you will need R and RStudio install
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/no1berg/ldh-assay-workflow.git](https://github.com/no1berg/ldh-assay-workflow.git)
-    cd ldh-assay-workflow
+    git clone [https://github.com/no1berg/LDH-assay-analysis-workflow-assay-workflow.git](https://github.com/no1berg/LDH-assay-analysis-workflow)
+    cd ldh-assay-analysis-workflow
     ```
 
 2.  **Install Required Packages:**
